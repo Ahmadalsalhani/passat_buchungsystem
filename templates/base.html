@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Passat Buchungssystem{% endblock %}</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    
+    <style>
+        :root {
+            --sidebar-width: 250px;
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            width: var(--sidebar-width);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding-top: 20px;
+            z-index: 1000;
+            overflow-y: auto;
+        }
+        
+        .sidebar .brand {
+            color: white;
+            font-size: 1.5rem;
+            font-weight: bold;
+            padding: 20px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            margin-bottom: 20px;
+        }
+        
+        .sidebar .nav-link {
+            color: rgba(255, 255, 255, 0.8);
+            padding: 12px 20px;
+            margin: 5px 10px;
+            border-radius: 8px;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+        }
+        
+        .sidebar .nav-link:hover,
+        .sidebar .nav-link.active {
+            color: white;
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateX(5px);
+        }
+        
+        .sidebar .nav-link i {
+            margin-right: 10px;
+            font-size: 1.2rem;
+        }
+        
+        .main-content {
+            margin-left: var(--sidebar-width);
+            padding: 20px;
+            min-height: 100vh;
+            background-color: #f8f9fa;
+        }
+        
+        .stat-card {
+            border-radius: 10px;
+            padding: 20px;
+            color: white;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .stat-card-blue {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .stat-card-green {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+        
+        .stat-card-orange {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+        
+        .stat-card-red {
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+        }
+        
+        .stat-card h3 {
+            font-size: 2.5rem;
+            margin: 10px 0;
+        }
+        
+        .badge-status {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+        }
+        
+        .badge-ausstehend {
+            background-color: #ffc107;
+            color: #000;
+        }
+        
+        .badge-bestaetigt {
+            background-color: #28a745;
+            color: #fff;
+        }
+        
+        .badge-storniert {
+            background-color: #dc3545;
+            color: #fff;
+        }
+        
+        .badge-abgeschlossen {
+            background-color: #6c757d;
+            color: #fff;
+        }
+        
+        .badge-entwurf {
+            background-color: #6c757d;
+            color: #fff;
+        }
+        
+        .badge-versendet {
+            background-color: #17a2b8;
+            color: #fff;
+        }
+        
+        .badge-bezahlt {
+            background-color: #28a745;
+            color: #fff;
+        }
+        
+        .card {
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+        
+        .card-header {
+            background-color: white;
+            border-bottom: 2px solid #f0f0f0;
+            font-weight: bold;
+            padding: 15px 20px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+        }
+        
+        .btn-primary:hover {
+            opacity: 0.9;
+        }
+        
+        .table {
+            background-color: white;
+        }
+        
+        .user-info {
+            color: rgba(255, 255, 255, 0.9);
+            padding: 15px 20px;
+            margin-top: auto;
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+        }
+    </style>
+    
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    {% if user.is_authenticated %}
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="brand">
+            <i class="bi bi-calendar-check"></i> Passat
+        </div>
+        
+        <nav class="nav flex-column">
+            <a class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}" href="{% url 'bookings:dashboard' %}">
+                <i class="bi bi-speedometer2"></i> Dashboard
+            </a>
+            <a class="nav-link {% if 'customers' in request.path %}active{% endif %}" href="{% url 'customers:customer_list' %}">
+                <i class="bi bi-people"></i> Kunden
+            </a>
+            <a class="nav-link {% if 'rooms' in request.path %}active{% endif %}" href="{% url 'rooms:room_list' %}">
+                <i class="bi bi-door-open"></i> Räume
+            </a>
+            <a class="nav-link {% if 'bookings' in request.path or 'liste' in request.path %}active{% endif %}" href="{% url 'bookings:booking_list' %}">
+                <i class="bi bi-calendar-event"></i> Buchungen
+            </a>
+            <a class="nav-link {% if 'invoices' in request.path or 'rechnungen' in request.path %}active{% endif %}" href="{% url 'invoices:invoice_list' %}">
+                <i class="bi bi-file-earmark-text"></i> Rechnungen
+            </a>
+            <a class="nav-link" href="/admin/" target="_blank">
+                <i class="bi bi-gear"></i> Admin
+            </a>
+            <a class="nav-link" href="{% url 'accounts:logout' %}">
+                <i class="bi bi-box-arrow-right"></i> Abmelden
+            </a>
+        </nav>
+        
+        <div class="user-info">
+            <i class="bi bi-person-circle"></i> {{ user.username }}
+            {% if user.is_admin_role %}
+            <span class="badge bg-warning text-dark ms-2">Admin</span>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+    
+    <!-- Main Content -->
+    <div class="{% if user.is_authenticated %}main-content{% else %}container mt-5{% endif %}">
+        <!-- Messages -->
+        {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        
+        {% block content %}{% endblock %}
+    </div>
+    
+    <!-- Bootstrap 5 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

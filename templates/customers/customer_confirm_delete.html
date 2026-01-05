@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block title %}Kunde löschen - Passat Buchungssystem{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-danger text-white">
+                    <i class="bi bi-exclamation-triangle"></i> Kunde löschen
+                </div>
+                <div class="card-body">
+                    <p>Möchten Sie den Kunden <strong>{{ customer.get_full_name }}</strong> wirklich löschen?</p>
+                    <p class="text-danger"><strong>Achtung:</strong> Diese Aktion kann nicht rückgängig gemacht werden.</p>
+                    
+                    <form method="post">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger">
+                            <i class="bi bi-trash"></i> Ja, löschen
+                        </button>
+                        <a href="{% url 'customers:customer_detail' customer.pk %}" class="btn btn-secondary">Abbrechen</a>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

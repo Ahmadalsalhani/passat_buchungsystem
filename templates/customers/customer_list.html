@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Kunden - Passat Buchungssystem{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1><i class="bi bi-people"></i> Kunden</h1>
+        <a href="{% url 'customers:customer_create' %}" class="btn btn-primary">
+            <i class="bi bi-person-plus"></i> Neuer Kunde
+        </a>
+    </div>
+    
+    <!-- Search -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="get" class="row g-3">
+                <div class="col-md-10">
+                    <input type="text" name="search" class="form-control" placeholder="Suche nach Name, E-Mail oder Telefon..." value="{{ search_query }}">
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="bi bi-search"></i> Suchen
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Customer List -->
+    <div class="card">
+        <div class="card-header">
+            Alle Kunden ({{ customers.count }})
+        </div>
+        <div class="card-body">
+            {% if customers %}
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>E-Mail</th>
+                            <th>Telefon</th>
+                            <th>Stadt</th>
+                            <th>Aktionen</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for customer in customers %}
+                        <tr>
+                            <td>{{ customer.get_anrede_display }} {{ customer.get_full_name }}</td>
+                            <td>{{ customer.email }}</td>
+                            <td>{{ customer.telefon }}</td>
+                            <td>{{ customer.stadt }}</td>
+                            <td>
+                                <a href="{% url 'customers:customer_detail' customer.pk %}" class="btn btn-sm btn-outline-primary">
+                                    <i class="bi bi-eye"></i>
+                                </a>
+                                <a href="{% url 'customers:customer_update' customer.pk %}" class="btn btn-sm btn-outline-warning">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                                <a href="{% url 'customers:customer_delete' customer.pk %}" class="btn btn-sm btn-outline-danger">
+                                    <i class="bi bi-trash"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <p class="text-muted mb-0">Keine Kunden gefunden.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

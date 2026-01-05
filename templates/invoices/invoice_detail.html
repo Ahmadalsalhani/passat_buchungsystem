@@ -1,0 +1,141 @@
+{% extends 'base.html' %}
+
+{% block title %}Rechnung {{ invoice.rechnungsnummer }} - Passat Buchungssystem{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1><i class="bi bi-file-earmark-text"></i> Rechnung {{ invoice.rechnungsnummer }}</h1>
+        <div>
+            <a href="{% url 'invoices:invoice_pdf' invoice.pk %}" class="btn btn-success">
+                <i class="bi bi-file-pdf"></i> PDF herunterladen
+            </a>
+            <a href="{% url 'invoices:invoice_update' invoice.pk %}" class="btn btn-warning">
+                <i class="bi bi-pencil"></i> Bearbeiten
+            </a>
+            <a href="{% url 'invoices:invoice_list' %}" class="btn btn-secondary">
+                <i class="bi bi-arrow-left"></i> Zurück
+            </a>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">Rechnungsinformationen</div>
+                <div class="card-body">
+                    <table class="table table-borderless">
+                        <tr>
+                            <th width="180">Rechnungsnummer:</th>
+                            <td><strong>{{ invoice.rechnungsnummer }}</strong></td>
+                        </tr>
+                        <tr>
+                            <th>Rechnungsdatum:</th>
+                            <td>{{ invoice.rechnungsdatum|date:"d.m.Y" }}</td>
+                        </tr>
+                        <tr>
+                            <th>Fälligkeitsdatum:</th>
+                            <td>{{ invoice.faelligkeitsdatum|date:"d.m.Y" }}</td>
+                        </tr>
+                        <tr>
+                            <th>Status:</th>
+                            <td><span class="badge badge-status badge-{{ invoice.status }}">{{ invoice.get_status_display }}</span></td>
+                        </tr>
+                        <tr>
+                            <th>MwSt.-Satz:</th>
+                            <td>{{ invoice.mwst_satz }}%</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+            
+            <div class="card mt-3">
+                <div class="card-header">Kundeninformationen</div>
+                <div class="card-body">
+                    <h6>{{ invoice.buchung.kunde.get_anrede_display }} {{ invoice.buchung.kunde.get_full_name }}</h6>
+                    <address>
+                        {{ invoice.buchung.kunde.strasse }}<br>
+                        {{ invoice.buchung.kunde.plz }} {{ invoice.buchung.kunde.stadt }}<br>
+                        {{ invoice.buchung.kunde.land }}
+                    </address>
+                    <p class="mb-0">
+                        <i class="bi bi-envelope"></i> {{ invoice.buchung.kunde.email }}<br>
+                        <i class="bi bi-telephone"></i> {{ invoice.buchung.kunde.telefon }}
+                    </p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">Buchungsdetails</div>
+                <div class="card-body">
+                    <table class="table table-borderless">
+                        <tr>
+                            <th width="180">Buchungs-ID:</th>
+                            <td>
+                                <a href="{% url 'bookings:booking_detail' invoice.buchung.pk %}">
+                                    #{{ invoice.buchung.pk }}
+                                </a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Raum:</th>
+                            <td>{{ invoice.buchung.raum.raumnummer }} - {{ invoice.buchung.raum.raumname }}</td>
+                        </tr>
+                        <tr>
+                            <th>Raumtyp:</th>
+                            <td>{{ invoice.buchung.raum.get_raumtyp_display }}</td>
+                        </tr>
+                        <tr>
+                            <th>Check-in:</th>
+                            <td>{{ invoice.buchung.check_in|date:"d.m.Y" }}</td>
+                        </tr>
+                        <tr>
+                            <th>Check-out:</th>
+                            <td>{{ invoice.buchung.check_out|date:"d.m.Y" }}</td>
+                        </tr>
+                        <tr>
+                            <th>Anzahl Nächte:</th>
+                            <td>{{ invoice.buchung.anzahl_naechte }}</td>
+                        </tr>
+                        <tr>
+                            <th>Anzahl Gäste:</th>
+                            <td>{{ invoice.buchung.anzahl_gaeste }}</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+            
+            <div class="card mt-3">
+                <div class="card-header">Preisberechnung</div>
+                <div class="card-body">
+                    <table class="table table-borderless">
+                        <tr>
+                            <th width="180">Zwischensumme:</th>
+                            <td>{{ invoice.zwischensumme }} €</td>
+                        </tr>
+                        <tr>
+                            <th>MwSt. ({{ invoice.mwst_satz }}%):</th>
+                            <td>{{ invoice.mwst_betrag }} €</td>
+                        </tr>
+                        <tr class="border-top">
+                            <th>Gesamtbetrag:</th>
+                            <td><strong class="fs-4 text-primary">{{ invoice.gesamtbetrag }} €</strong></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    {% if invoice.notizen %}
+    <div class="card mt-3">
+        <div class="card-header">Notizen</div>
+        <div class="card-body">
+            {{ invoice.notizen|linebreaks }}
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+
+{% block title %}Rechnung löschen - Passat Buchungssystem{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-danger text-white">
+                    <i class="bi bi-exclamation-triangle"></i> Rechnung löschen
+                </div>
+                <div class="card-body">
+                    <p>Möchten Sie die Rechnung <strong>{{ invoice.rechnungsnummer }}</strong> wirklich löschen?</p>
+                    <ul>
+                        <li>Kunde: {{ invoice.buchung.kunde.get_full_name }}</li>
+                        <li>Buchung: #{{ invoice.buchung.pk }}</li>
+                        <li>Betrag: {{ invoice.gesamtbetrag }} €</li>
+                    </ul>
+                    <p class="text-danger"><strong>Achtung:</strong> Diese Aktion kann nicht rückgängig gemacht werden.</p>
+                    
+                    <form method="post">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger">
+                            <i class="bi bi-trash"></i> Ja, löschen
+                        </button>
+                        <a href="{% url 'invoices:invoice_detail' invoice.pk %}" class="btn btn-secondary">Abbrechen</a>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
