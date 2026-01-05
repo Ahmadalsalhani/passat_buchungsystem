@@ -1,0 +1,109 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ customer.get_full_name }} - Passat Buchungssystem{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1><i class="bi bi-person"></i> {{ customer.get_full_name }}</h1>
+        <div>
+            <a href="{% url 'customers:customer_update' customer.pk %}" class="btn btn-warning">
+                <i class="bi bi-pencil"></i> Bearbeiten
+            </a>
+            <a href="{% url 'customers:customer_list' %}" class="btn btn-secondary">
+                <i class="bi bi-arrow-left"></i> Zurück
+            </a>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">Persönliche Daten</div>
+                <div class="card-body">
+                    <table class="table table-borderless">
+                        <tr>
+                            <th width="150">Anrede:</th>
+                            <td>{{ customer.get_anrede_display }}</td>
+                        </tr>
+                        <tr>
+                            <th>Name:</th>
+                            <td>{{ customer.get_full_name }}</td>
+                        </tr>
+                        <tr>
+                            <th>E-Mail:</th>
+                            <td><a href="mailto:{{ customer.email }}">{{ customer.email }}</a></td>
+                        </tr>
+                        <tr>
+                            <th>Telefon:</th>
+                            <td><a href="tel:{{ customer.telefon }}">{{ customer.telefon }}</a></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">Adresse</div>
+                <div class="card-body">
+                    <address>
+                        {{ customer.strasse }}<br>
+                        {{ customer.plz }} {{ customer.stadt }}<br>
+                        {{ customer.land }}
+                    </address>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    {% if customer.notizen %}
+    <div class="card mt-3">
+        <div class="card-header">Notizen</div>
+        <div class="card-body">
+            {{ customer.notizen|linebreaks }}
+        </div>
+    </div>
+    {% endif %}
+    
+    <div class="card mt-3">
+        <div class="card-header">Buchungen</div>
+        <div class="card-body">
+            {% if customer.buchungen.all %}
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Raum</th>
+                            <th>Check-in</th>
+                            <th>Check-out</th>
+                            <th>Status</th>
+                            <th>Aktionen</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for booking in customer.buchungen.all %}
+                        <tr>
+                            <td>#{{ booking.pk }}</td>
+                            <td>{{ booking.raum.raumnummer }}</td>
+                            <td>{{ booking.check_in|date:"d.m.Y" }}</td>
+                            <td>{{ booking.check_out|date:"d.m.Y" }}</td>
+                            <td><span class="badge badge-status badge-{{ booking.status }}">{{ booking.get_status_display }}</span></td>
+                            <td>
+                                <a href="{% url 'bookings:booking_detail' booking.pk %}" class="btn btn-sm btn-outline-primary">
+                                    <i class="bi bi-eye"></i> Details
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <p class="text-muted mb-0">Keine Buchungen vorhanden.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

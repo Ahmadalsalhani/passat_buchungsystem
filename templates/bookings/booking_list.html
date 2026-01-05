@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+
+{% block title %}Buchungen - Passat Buchungssystem{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1><i class="bi bi-calendar-event"></i> Buchungen</h1>
+        <a href="{% url 'bookings:booking_create' %}" class="btn btn-primary">
+            <i class="bi bi-plus-circle"></i> Neue Buchung
+        </a>
+    </div>
+    
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="get" class="row g-3">
+                <div class="col-md-7">
+                    <input type="text" name="search" class="form-control" placeholder="Suche nach Kunde oder Raum..." value="{{ search_query }}">
+                </div>
+                <div class="col-md-3">
+                    <select name="status" class="form-select">
+                        <option value="">Alle Status</option>
+                        {% for value, label in status_choices %}
+                        <option value="{{ value }}" {% if status_filter == value %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="bi bi-search"></i> Suchen
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <div class="card">
+        <div class="card-header">Alle Buchungen ({{ bookings.count }})</div>
+        <div class="card-body">
+            {% if bookings %}
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Kunde</th>
+                            <th>Raum</th>
+                            <th>Check-in</th>
+                            <th>Check-out</th>
+                            <th>Nächte</th>
+                            <th>Gäste</th>
+                            <th>Status</th>
+                            <th>Preis</th>
+                            <th>Aktionen</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for booking in bookings %}
+                        <tr>
+                            <td><strong>#{{ booking.pk }}</strong></td>
+                            <td>{{ booking.kunde.get_full_name }}</td>
+                            <td>{{ booking.raum.raumnummer }}</td>
+                            <td>{{ booking.check_in|date:"d.m.Y" }}</td>
+                            <td>{{ booking.check_out|date:"d.m.Y" }}</td>
+                            <td>{{ booking.anzahl_naechte }}</td>
+                            <td>{{ booking.anzahl_gaeste }}</td>
+                            <td><span class="badge badge-status badge-{{ booking.status }}">{{ booking.get_status_display }}</span></td>
+                            <td><strong>{{ booking.gesamtpreis }} €</strong></td>
+                            <td>
+                                <a href="{% url 'bookings:booking_detail' booking.pk %}" class="btn btn-sm btn-outline-primary">
+                                    <i class="bi bi-eye"></i>
+                                </a>
+                                <a href="{% url 'bookings:booking_update' booking.pk %}" class="btn btn-sm btn-outline-warning">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <p class="text-muted mb-0">Keine Buchungen gefunden.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

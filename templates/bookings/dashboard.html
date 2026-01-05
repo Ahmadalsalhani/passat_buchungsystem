@@ -1,0 +1,121 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard - Passat Buchungssystem{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <h1 class="mb-4">
+        <i class="bi bi-speedometer2"></i> Dashboard
+    </h1>
+    
+    <!-- Statistik Cards -->
+    <div class="row">
+        <div class="col-md-3">
+            <div class="stat-card stat-card-blue">
+                <i class="bi bi-calendar-event" style="font-size: 2rem;"></i>
+                <h3>{{ total_bookings }}</h3>
+                <p class="mb-0">Gesamte Buchungen</p>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card stat-card-orange">
+                <i class="bi bi-clock-history" style="font-size: 2rem;"></i>
+                <h3>{{ pending_bookings }}</h3>
+                <p class="mb-0">Ausstehende Buchungen</p>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card stat-card-green">
+                <i class="bi bi-check-circle" style="font-size: 2rem;"></i>
+                <h3>{{ confirmed_bookings }}</h3>
+                <p class="mb-0">Bestätigte Buchungen</p>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card stat-card-red">
+                <i class="bi bi-people" style="font-size: 2rem;"></i>
+                <h3>{{ total_customers }}</h3>
+                <p class="mb-0">Gesamte Kunden</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Quick Actions -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <i class="bi bi-lightning"></i> Schnellzugriff
+                </div>
+                <div class="card-body">
+                    <a href="{% url 'bookings:booking_create' %}" class="btn btn-primary me-2">
+                        <i class="bi bi-plus-circle"></i> Neue Buchung
+                    </a>
+                    <a href="{% url 'customers:customer_create' %}" class="btn btn-success me-2">
+                        <i class="bi bi-person-plus"></i> Neuer Kunde
+                    </a>
+                    <a href="{% url 'rooms:room_create' %}" class="btn btn-info me-2">
+                        <i class="bi bi-door-open"></i> Neuer Raum
+                    </a>
+                    <a href="{% url 'invoices:invoice_create' %}" class="btn btn-warning">
+                        <i class="bi bi-file-earmark-plus"></i> Neue Rechnung
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Recent Bookings -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <i class="bi bi-clock-history"></i> Letzte Buchungen
+                </div>
+                <div class="card-body">
+                    {% if recent_bookings %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Kunde</th>
+                                    <th>Raum</th>
+                                    <th>Check-in</th>
+                                    <th>Check-out</th>
+                                    <th>Status</th>
+                                    <th>Aktionen</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for booking in recent_bookings %}
+                                <tr>
+                                    <td>#{{ booking.pk }}</td>
+                                    <td>{{ booking.kunde.get_full_name }}</td>
+                                    <td>{{ booking.raum.raumnummer }}</td>
+                                    <td>{{ booking.check_in|date:"d.m.Y" }}</td>
+                                    <td>{{ booking.check_out|date:"d.m.Y" }}</td>
+                                    <td>
+                                        <span class="badge badge-status badge-{{ booking.status }}">
+                                            {{ booking.get_status_display }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <a href="{% url 'bookings:booking_detail' booking.pk %}" class="btn btn-sm btn-outline-primary">
+                                            <i class="bi bi-eye"></i> Details
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <p class="text-muted mb-0">Keine Buchungen vorhanden.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

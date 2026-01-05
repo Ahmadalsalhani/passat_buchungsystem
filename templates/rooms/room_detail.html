@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ room.raumname }} - Passat Buchungssystem{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1><i class="bi bi-door-open"></i> {{ room.raumnummer }} - {{ room.raumname }}</h1>
+        <div>
+            <a href="{% url 'rooms:room_update' room.pk %}" class="btn btn-warning">
+                <i class="bi bi-pencil"></i> Bearbeiten
+            </a>
+            <a href="{% url 'rooms:room_list' %}" class="btn btn-secondary">
+                <i class="bi bi-arrow-left"></i> Zurück
+            </a>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">Rauminformationen</div>
+                <div class="card-body">
+                    <table class="table table-borderless">
+                        <tr>
+                            <th width="150">Raumnummer:</th>
+                            <td>{{ room.raumnummer }}</td>
+                        </tr>
+                        <tr>
+                            <th>Name:</th>
+                            <td>{{ room.raumname }}</td>
+                        </tr>
+                        <tr>
+                            <th>Typ:</th>
+                            <td>{{ room.get_raumtyp_display }}</td>
+                        </tr>
+                        <tr>
+                            <th>Kapazität:</th>
+                            <td>{{ room.kapazitaet }} Personen</td>
+                        </tr>
+                        <tr>
+                            <th>Preis/Nacht:</th>
+                            <td><strong>{{ room.preis_pro_nacht }} €</strong></td>
+                        </tr>
+                        <tr>
+                            <th>Status:</th>
+                            <td>
+                                {% if room.aktiv %}
+                                <span class="badge bg-success">Aktiv</span>
+                                {% else %}
+                                <span class="badge bg-secondary">Inaktiv</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">Beschreibung</div>
+                <div class="card-body">
+                    {% if room.beschreibung %}
+                    {{ room.beschreibung|linebreaks }}
+                    {% else %}
+                    <p class="text-muted mb-0">Keine Beschreibung vorhanden.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

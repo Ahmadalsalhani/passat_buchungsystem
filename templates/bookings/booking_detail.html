@@ -1,0 +1,112 @@
+{% extends 'base.html' %}
+
+{% block title %}Buchung #{{ booking.pk }} - Passat Buchungssystem{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1><i class="bi bi-calendar-event"></i> Buchung #{{ booking.pk }}</h1>
+        <div>
+            <a href="{% url 'bookings:booking_update' booking.pk %}" class="btn btn-warning">
+                <i class="bi bi-pencil"></i> Bearbeiten
+            </a>
+            <a href="{% url 'bookings:booking_list' %}" class="btn btn-secondary">
+                <i class="bi bi-arrow-left"></i> Zurück
+            </a>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">Buchungsdetails</div>
+                <div class="card-body">
+                    <table class="table table-borderless">
+                        <tr>
+                            <th width="150">Buchungs-ID:</th>
+                            <td><strong>#{{ booking.pk }}</strong></td>
+                        </tr>
+                        <tr>
+                            <th>Kunde:</th>
+                            <td>
+                                <a href="{% url 'customers:customer_detail' booking.kunde.pk %}">
+                                    {{ booking.kunde.get_full_name }}
+                                </a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Raum:</th>
+                            <td>
+                                <a href="{% url 'rooms:room_detail' booking.raum.pk %}">
+                                    {{ booking.raum.raumnummer }} - {{ booking.raum.raumname }}
+                                </a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Check-in:</th>
+                            <td>{{ booking.check_in|date:"d.m.Y" }}</td>
+                        </tr>
+                        <tr>
+                            <th>Check-out:</th>
+                            <td>{{ booking.check_out|date:"d.m.Y" }}</td>
+                        </tr>
+                        <tr>
+                            <th>Anzahl Nächte:</th>
+                            <td><strong>{{ booking.anzahl_naechte }}</strong></td>
+                        </tr>
+                        <tr>
+                            <th>Anzahl Gäste:</th>
+                            <td>{{ booking.anzahl_gaeste }}</td>
+                        </tr>
+                        <tr>
+                            <th>Status:</th>
+                            <td><span class="badge badge-status badge-{{ booking.status }}">{{ booking.get_status_display }}</span></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">Preisberechnung</div>
+                <div class="card-body">
+                    <table class="table table-borderless">
+                        <tr>
+                            <th width="200">Preis pro Nacht:</th>
+                            <td>{{ booking.raum.preis_pro_nacht }} €</td>
+                        </tr>
+                        <tr>
+                            <th>Anzahl Nächte:</th>
+                            <td>× {{ booking.anzahl_naechte }}</td>
+                        </tr>
+                        <tr class="border-top">
+                            <th>Gesamtpreis:</th>
+                            <td><strong class="fs-4 text-primary">{{ booking.gesamtpreis }} €</strong></td>
+                        </tr>
+                    </table>
+                    
+                    {% if not booking.rechnung %}
+                    <a href="{% url 'invoices:invoice_create' %}?booking={{ booking.pk }}" class="btn btn-success w-100">
+                        <i class="bi bi-file-earmark-plus"></i> Rechnung erstellen
+                    </a>
+                    {% else %}
+                    <a href="{% url 'invoices:invoice_detail' booking.rechnung.pk %}" class="btn btn-primary w-100">
+                        <i class="bi bi-file-earmark-text"></i> Rechnung anzeigen
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    {% if booking.notizen %}
+    <div class="card mt-3">
+        <div class="card-header">Notizen</div>
+        <div class="card-body">
+            {{ booking.notizen|linebreaks }}
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
