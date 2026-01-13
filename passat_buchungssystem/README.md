@@ -58,9 +58,10 @@ cd passat_buchungsystem
 ```
 
 2. **Virtuelle Umgebung erstellen und aktivieren**
-```bash
+```bash erstellen
 python -m venv venv
 
+++aktivieren
 # Windows
 venv\Scripts\activate
 
@@ -71,11 +72,16 @@ venv\Scripts\activate
 # Linux/Mac
 source venv/bin/activate
 ```
+# **Django installieren auf den richtigen feil und venv
+'''
+pip -m pip install django
+
+'''
 
 3. **Dependencies installieren**
 ```bash
 pip install -r requirements.txt
-pip install docuple(manuell eingegeben)
+pip install decouple(manuell eingegeben)
 pip install django-crispy-forms(manuell eingegeben)
 pip install crispy-bootstrap5(manuell eingegeben)
 pip install reportlab(manuell eingegeben)

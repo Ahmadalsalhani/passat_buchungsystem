@@ -1,0 +1,313 @@
+{% extends 'base.html' %}
+{% load custom_filters %}
+
+{% block title %}Kalenderübersicht - Passat Buchungssystem{% endblock %}
+
+{% block extra_css %}
+<style>
+    .calendar-container {
+        background: white;
+        border-radius: 10px;
+        padding: 20px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    
+    .calendar-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 30px;
+        padding-bottom: 15px;
+        border-bottom: 2px solid #f0f0f0;
+    }
+    
+    .calendar-navigation {
+        display: flex;
+        gap: 10px;
+    }
+    
+    .calendar-table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+        margin-top: 20px;
+    }
+    
+    .calendar-table th {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 12px 8px;
+        text-align: center;
+        font-weight: 600;
+        border: 1px solid #5a67d8;
+    }
+    
+    .calendar-table th:first-child {
+        border-top-left-radius: 8px;
+    }
+    
+    .calendar-table th:last-child {
+        border-top-right-radius: 8px;
+    }
+    
+    .calendar-table td {
+        border: 1px solid #e0e0e0;
+        padding: 8px;
+        vertical-align: top;
+        min-height: 80px;
+        background-color: #fff;
+    }
+    
+    .day-number {
+        font-weight: bold;
+        color: #333;
+        margin-bottom: 5px;
+        font-size: 0.9rem;
+    }
+    
+    .room-cell {
+        border: 1px solid #e0e0e0;
+        padding: 4px;
+        min-height: 60px;
+    }
+    
+    .room-cell.free {
+        background-color: #d4edda;
+    }
+    
+    .room-cell.occupied {
+        background-color: #f8f9fa;
+    }
+    
+    .booking-badge {
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 0.75rem;
+        margin: 2px 0;
+        display: block;
+        color: white;
+        font-weight: 500;
+        text-align: center;
+        cursor: pointer;
+        transition: opacity 0.2s;
+    }
+    
+    .booking-badge:hover {
+        opacity: 0.8;
+        text-decoration: none;
+    }
+    
+    .empty-day {
+        background-color: #f8f9fa;
+    }
+    
+    .room-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 10px;
+        text-align: center;
+        font-weight: 600;
+        border: 1px solid #5a67d8;
+    }
+    
+    .calendar-grid {
+        display: grid;
+        grid-template-columns: 100px repeat(auto-fit, minmax(100px, 1fr));
+        gap: 1px;
+        background-color: #e0e0e0;
+        margin-top: 20px;
+    }
+    
+    .calendar-cell {
+        background-color: white;
+        padding: 8px;
+        min-height: 80px;
+    }
+    
+    .date-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 10px;
+        text-align: center;
+        font-weight: 600;
+    }
+    
+    .room-label {
+        background-color: #f8f9fa;
+        padding: 10px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        border-right: 2px solid #e0e0e0;
+    }
+    
+    .legend {
+        display: flex;
+        gap: 20px;
+        margin-top: 20px;
+        padding: 15px;
+        background-color: #f8f9fa;
+        border-radius: 8px;
+    }
+    
+    .legend-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    .legend-color {
+        width: 30px;
+        height: 20px;
+        border-radius: 4px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="calendar-container">
+    <div class="calendar-header">
+        <div>
+            <h2><i class="bi bi-calendar-week"></i> Kalenderübersicht</h2>
+            <p class="text-muted mb-0">{{ month_name }} {{ year }}</p>
+        </div>
+        <div class="calendar-navigation">
+            <a href="?year={{ prev_year }}&month={{ prev_month }}" class="btn btn-outline-primary">
+                <i class="bi bi-chevron-left"></i> Vorheriger Monat
+            </a>
+            <a href="?year={{ year }}&month={{ month }}" class="btn btn-primary">
+                Heute
+            </a>
+            <a href="?year={{ next_year }}&month={{ next_month }}" class="btn btn-outline-primary">
+                Nächster Monat <i class="bi bi-chevron-right"></i>
+            </a>
+        </div>
+    </div>
+
+    <div class="legend">
+        <div class="legend-item">
+            <div class="legend-color" style="background-color: #d4edda;"></div>
+            <span>Freier Raum</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color" style="background-color: #f8f9fa;"></div>
+            <span>Belegter Raum</span>
+        </div>
+    </div>
+
+    <!-- Kalenderansicht: Tage x Räume -->
+    <div style="overflow-x: auto; margin-top: 20px;">
+        <table class="table table-bordered" style="min-width: 1200px;">
+            <thead>
+                <tr>
+                    <th style="width: 120px;">Raum / Datum</th>
+                    {% for week in calendar %}
+                        {% for day in week %}
+                            {% if day != 0 %}
+                                <th style="min-width: 100px;">{{ day }}</th>
+                            {% else %}
+                                <th style="min-width: 100px; background-color: #f8f9fa;"></th>
+                            {% endif %}
+                        {% endfor %}
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for room in rooms %}
+                <tr>
+                    <td class="room-label">
+                        <div>
+                            <strong>{{ room.raumnummer }}</strong><br>
+                            <small>{{ room.raumname }}</small>
+                        </div>
+                    </td>
+                    {% for week in calendar %}
+                        {% for day in week %}
+                            <td class="room-cell {% if day in calendar_data and room.id in calendar_data|lookup:day %}occupied{% elif day != 0 %}free{% else %}empty-day{% endif %}">
+                                {% if day != 0 %}
+                                    {% if day in calendar_data and room.id in calendar_data|lookup:day %}
+                                        {% for booking_data in calendar_data|lookup:day|lookup:room.id %}
+                                            <a href="{% url 'bookings:booking_detail' booking_data.booking.pk %}" 
+                                               class="booking-badge" 
+                                               style="background-color: {{ booking_data.color }};"
+                                               title="Kunde: {{ booking_data.customer_name }}&#10;Check-in: {{ booking_data.booking.check_in }}&#10;Check-out: {{ booking_data.booking.check_out }}">
+                                                {{ booking_data.customer_name|truncatechars:15 }}
+                                            </a>
+                                        {% endfor %}
+                                    {% endif %}
+                                {% endif %}
+                            </td>
+                        {% endfor %}
+                    {% endfor %}
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="mt-4">
+        <h5>Buchungen im {{ month_name }} {{ year }}</h5>
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Buchung #</th>
+                        <th>Kunde</th>
+                        <th>Raum</th>
+                        <th>Check-in</th>
+                        <th>Check-out</th>
+                        <th>Status</th>
+                        <th>Aktionen</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for booking in bookings %}
+                    <tr>
+                        <td>{{ booking.pk }}</td>
+                        <td>{{ booking.kunde.get_full_name }}</td>
+                        <td>{{ booking.raum.raumnummer }} - {{ booking.raum.raumname }}</td>
+                        <td>{{ booking.check_in|date:"d.m.Y" }}</td>
+                        <td>{{ booking.check_out|date:"d.m.Y" }}</td>
+                        <td>
+                            <span class="badge badge-{{ booking.status }}">
+                                {{ booking.get_status_display }}
+                            </span>
+                        </td>
+                        <td>
+                            <a href="{% url 'bookings:booking_detail' booking.pk %}" class="btn btn-sm btn-info">
+                                <i class="bi bi-eye"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" class="text-center text-muted">
+                            Keine Buchungen für diesen Monat
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Tooltip für Buchungen
+    document.addEventListener('DOMContentLoaded', function() {
+        const bookingBadges = document.querySelectorAll('.booking-badge');
+        bookingBadges.forEach(badge => {
+            badge.addEventListener('mouseenter', function() {
+                this.style.transform = 'scale(1.05)';
+            });
+            badge.addEventListener('mouseleave', function() {
+                this.style.transform = 'scale(1)';
+            });
+        });
+    });
+</script>
+{% endblock %}

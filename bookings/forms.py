@@ -11,6 +11,8 @@ class BookingForm(forms.ModelForm):
             'check_in': forms.DateInput(attrs={'type': 'date'}),
             'check_out': forms.DateInput(attrs={'type': 'date'}),
             'notizen': forms.Textarea(attrs={'rows': 3}),
+            'kunde': forms.Select(attrs={'class': 'customer-select2'}),
+            'raum': forms.Select(attrs={'class': 'room-select2'}),
         }
     
     def __init__(self, *args, **kwargs):
