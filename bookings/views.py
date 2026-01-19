@@ -118,10 +118,12 @@ def booking_delete(request, pk):
 @login_required
 def calendar_overview(request):
     """Kalenderübersicht mit allen Buchungen"""
-    # Aktuelles Jahr und Monat aus GET-Parameter oder Standard
-    current_date = datetime.now().date()
-    year = int(request.GET.get('year', current_date.year))
-    month = int(request.GET.get('month', current_date.month))
+    # Aktuelles Datum (heute) speichern
+    today = datetime.now().date()
+    
+    # Jahr und Monat aus GET-Parameter oder Standard (heute)
+    year = int(request.GET.get('year', today.year))
+    month = int(request.GET.get('month', today.month))
     
     # Ersten und letzten Tag des Monats bestimmen
     first_day = datetime(year, month, 1).date()
@@ -153,15 +155,15 @@ def calendar_overview(request):
     calendar_data = {}
     for day in range(1, 32):
         try:
-            current_date = datetime(year, month, day).date()
+            day_date = datetime(year, month, day).date()
             calendar_data[day] = {}
             
             for room in rooms:
                 # Alle Buchungen für diesen Tag und Raum finden
                 day_bookings = bookings.filter(
                     raum=room,
-                    check_in__lte=current_date,
-                    check_out__gte=current_date
+                    check_in__lte=day_date,
+                    check_out__gte=day_date
                 )
                 
                 calendar_data[day][room.id] = []
@@ -207,10 +209,10 @@ def calendar_overview(request):
         'prev_year': prev_year,
         'next_month': next_month,
         'next_year': next_year,
-        'today_day': current_date.day,
-        'today_month': current_date.month,
-        'today_year': current_date.year,
-        'is_current_month': current_date.year == year and current_date.month == month,
+        'today_day': today.day,
+        'today_month': today.month,
+        'today_year': today.year,
+        'is_current_month': today.year == year and today.month == month,
     }
     return render(request, 'bookings/calendar_overview.html', context)
 
