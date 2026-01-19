@@ -96,6 +96,22 @@
         opacity: 0.8;
         text-decoration: none;
     }
+
+    .today-header {
+        font-weight: 800;
+        box-shadow: inset 0 -3px 0 rgba(255, 255, 255, 0.6);
+    }
+
+    .today-label {
+        font-weight: 800;
+        color: #c1121f;
+    }
+
+    .today-cell {
+        outline: 2px solid #c1121f;
+        outline-offset: -2px;
+        background-color: #fff8f0;
+    }
     
     .empty-day {
         background-color: #f8f9fa;
@@ -177,7 +193,7 @@
             <a href="?year={{ prev_year }}&month={{ prev_month }}" class="btn btn-outline-primary">
                 <i class="bi bi-chevron-left"></i> Vorheriger Monat
             </a>
-            <a href="?year={{ year }}&month={{ month }}" class="btn btn-primary">
+            <a href="?year={{ today_year }}&month={{ today_month }}" class="btn btn-primary">
                 Heute
             </a>
             <a href="?year={{ next_year }}&month={{ next_month }}" class="btn btn-outline-primary">
@@ -206,7 +222,7 @@
                     {% for week in calendar %}
                         {% for day in week %}
                             {% if day != 0 %}
-                                <th style="min-width: 100px;">{{ day }}</th>
+                                <th style="min-width: 100px;" class="{% if is_current_month and day == today_day %}today-header{% endif %}">{{ day }}</th>
                             {% else %}
                                 <th style="min-width: 100px; background-color: #f8f9fa;"></th>
                             {% endif %}
@@ -225,8 +241,9 @@
                     </td>
                     {% for week in calendar %}
                         {% for day in week %}
-                            <td class="room-cell {% if day in calendar_data and room.id in calendar_data|lookup:day %}occupied{% elif day != 0 %}free{% else %}empty-day{% endif %}">
+                            <td class="room-cell {% if day in calendar_data and room.id in calendar_data|lookup:day %}occupied{% elif day != 0 %}free{% else %}empty-day{% endif %} {% if is_current_month and day == today_day %}today-cell{% endif %}">
                                 {% if day != 0 %}
+                                    <div class="day-number {% if is_current_month and day == today_day %}today-label{% endif %}">{{ day }}</div>
                                     {% if day in calendar_data and room.id in calendar_data|lookup:day %}
                                         {% for booking_data in calendar_data|lookup:day|lookup:room.id %}
                                             <a href="{% url 'bookings:booking_detail' booking_data.booking.pk %}" 

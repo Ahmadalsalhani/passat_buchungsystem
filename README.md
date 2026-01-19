@@ -10,6 +10,7 @@ Ein vollständiges internes Buchungssystem mit Python und Django zur Verwaltung 
 - Rollenbasierte Zugriffskontrolle
 
 ### Kundenverwaltung
+- Das Kalender muss 
 - Vollständige Kundendaten (Anrede, Name, Kontakt, Adresse)
 - Kunden anlegen, bearbeiten, löschen
 - Suchfunktion
